@@ -1,0 +1,14 @@
+# Repository-level ignores
+.env
+# IDE and OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
