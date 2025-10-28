@@ -1,2 +1,28 @@
 # ignore environment variable
 .env
+# ignore IDE specific files
+.vscode/
+.idea/
+# ignore OS generated files
+.DS_Store
+Thumbs.db
+# ignore compiled files
+*.class
+*.o
+*.exe
+# ignore log files
+*.log
+# ignore temporary files
+*.tmp
+# ignore dependency directories
+node_modules/
+vendor/
+# ignore build directories
+dist/
+build/
+out/
+# ignore coverage reports
+coverage/
+.nyc_output/
+# ignore lock files
+package-lock.json
