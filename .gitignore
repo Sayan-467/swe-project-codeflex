@@ -1,5 +1,22 @@
 # Repository-level ignores
+# Environment variables
 .env
+.env.*
+**/.env
+**/.env.*
+
+# Python virtual environments
+venv/
+env/
+ENV/
+**/venv/
+**/env/
+**/ENV/
+
+# Node.js dependencies
+node_modules/
+**/node_modules/
+
 # IDE and OS
 .vscode/
 .idea/

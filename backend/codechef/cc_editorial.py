@@ -1,6 +1,7 @@
 # cc_editorial.py
 import re
 import time
+import requests
 from typing import Optional, Dict, List
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -10,6 +11,91 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
+
+def fetch_discuss_explanations(problem_code: str):
+    """
+    Fetch meaningful CodeChef Discuss posts for a given problem.
+    This uses the CodeChef Discuss API to search for editorial/explanation posts.
+    
+    Filters out 'Help me' type posts and prefers 'Editorial' or 'Explanation' ones.
+    
+    Returns:
+        dict: {
+            "problem_code": str,
+            "count": int,
+            "posts": List[{title, url, text}],
+            "error": str (optional)
+        }
+    """
+    base_url = "https://discuss.codechef.com"
+    search_url = f"{base_url}/search.json?q={problem_code}"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json"
+    }
+
+    try:
+        res = requests.get(search_url, headers=headers, timeout=10)
+        res.raise_for_status()
+        data = res.json()
+
+        topics = data.get("topics", [])
+        posts = []
+
+        for topic in topics:
+            title = topic.get("title", "").lower()
+            
+            # Skip unhelpful posts
+            if any(bad in title for bad in ["help", "doubt", "error", "stuck", "solve", "solution needed", "please help"]):
+                continue
+            
+            # Only keep relevant posts
+            if not any(good in title for good in ["editorial", "explanation", "approach", "tutorial", "solution"]):
+                continue
+
+            topic_id = topic.get("id")
+            slug = topic.get("slug")
+            topic_url = f"{base_url}/t/{slug}/{topic_id}"
+
+            # Fetch the full topic content
+            try:
+                topic_res = requests.get(f"{base_url}/t/{topic_id}.json", headers=headers, timeout=10)
+                topic_json = topic_res.json()
+
+                post_stream = topic_json.get("post_stream", {}).get("posts", [])
+                if not post_stream:
+                    continue
+
+                first_post = post_stream[0]
+                cooked = first_post.get("cooked", "")
+                soup = BeautifulSoup(cooked, "html.parser")
+                text = soup.get_text(separator="\n", strip=True)
+
+                # Only add if we got substantial content
+                if len(text) > 100:
+                    posts.append({
+                        "title": topic.get("title"),
+                        "url": topic_url,
+                        "text": text[:3000]  # Limit text length
+                    })
+            except Exception as e:
+                print(f"Error fetching topic {topic_id}: {e}")
+                continue
+
+        return {
+            "problem_code": problem_code,
+            "count": len(posts),
+            "posts": posts
+        }
+
+    except Exception as e:
+        return {
+            "problem_code": problem_code,
+            "count": 0,
+            "posts": [],
+            "error": str(e)
+        }
 
 def setup_selenium_driver() -> webdriver.Chrome:
     """

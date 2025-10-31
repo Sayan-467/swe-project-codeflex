@@ -48,25 +48,38 @@ def root():
 @app.post("/generate/hints")
 def generate_hints(input_data: InputURL):
     """
-    Fetches CodeChef editorial, then uses Gemini or OpenAI to generate step-by-step hints.
+    Fetches CodeChef editorial from Discuss forum, then uses Gemini or OpenAI to generate step-by-step hints.
     """
     problem_url = input_data.problem_url
     
-    # Fetch editorial using our custom scraper
-    result = cce.get_editorial(problem_url)
+    # Extract problem code from URL
+    parsed = cce.parse_problem_url(problem_url)
+    if not parsed:
+        return {"error": "Invalid CodeChef problem URL format"}
+    
+    problem_code = parsed["problem_code"]
+    
+    # Fetch editorial from Discuss forum
+    result = cce.fetch_discuss_explanations(problem_code)
     
     if "error" in result:
         return {"error": result["error"]}
     
-    if not result.get("editorial_available") or not result.get("editorial_text"):
+    if result.get("count", 0) == 0:
         return {
             "error": "Editorial not available for this problem",
-            "message": "This problem may not have an editorial yet, or it's in a format we can't extract.",
-            "problem": result.get("problem", {})
+            "message": "No editorial found in CodeChef Discuss forum for this problem.",
+            "problem_code": problem_code
         }
     
-    metadata = result["problem"]
-    editorial_text = result["editorial_text"]
+    # Get the first (most relevant) editorial post
+    first_post = result["posts"][0]
+    editorial_text = first_post["text"]
+    metadata = {
+        "problem_code": problem_code,
+        "name": first_post["title"],
+        "editorial_url": first_post["url"]
+    }
     
     # Prepare the AI prompt
     prompt = f"""
@@ -122,24 +135,20 @@ Now generate clear, structured hints:
 @app.get("/fetch/editorial")
 def fetch_editorial(problem_url: Optional[str] = Query(None)):
     """
-    Debug endpoint to fetch and view editorial text directly.
+    Fetch editorial from CodeChef Discuss forum.
     """
     if not problem_url:
         return {"error": "Provide problem_url query parameter."}
 
-    result = cce.get_editorial(problem_url)
+    # Extract problem code from URL
+    parsed = cce.parse_problem_url(problem_url)
+    if not parsed:
+        return {"error": "Invalid CodeChef problem URL format"}
     
-    if "error" in result:
-        return result
+    problem_code = parsed["problem_code"]
     
-    # Limit preview for API response
-    if result.get("editorial_text"):
-        preview_length = 2000
-        result["editorial_preview"] = result["editorial_text"][:preview_length]
-        result["editorial_length"] = len(result["editorial_text"])
-        if len(result["editorial_text"]) > preview_length:
-            result["editorial_preview"] += "\n\n[... truncated for preview ...]"
-        del result["editorial_text"]  # Remove full text from response
+    # Fetch from Discuss
+    result = cce.fetch_discuss_explanations(problem_code)
     
     return result
 
