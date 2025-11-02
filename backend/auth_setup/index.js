@@ -7,6 +7,7 @@ import connectDB from "./src/db/connection.js"; // ✅ corrected path
 dotenv.config({ path: "./.env" });
 
 const PORT = process.env.PORT || 8000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 // Immediately invoked async function for clean async handling
 (async () => {
@@ -19,8 +20,8 @@ const PORT = process.env.PORT || 8000;
     const server = http.createServer(app);
 
     // Start server
-    server.listen(PORT, () => {
-      console.log(`🚀 Server is running at: http://localhost:${PORT}`);
+    server.listen(PORT, HOST, () => {
+      console.log(`🚀 Server is running at: http://${HOST}:${PORT}`);
     });
   } catch (err) {
     console.error("❌ Server startup failed:", err.message);
