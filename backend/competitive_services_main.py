@@ -270,6 +270,8 @@ def codeforces_fetch_editorial(problem_url: Optional[str] = Query(None)):
         return {"error": "Invalid problem URL format."}
 
     contest_id = parsed["contest_id"]
+
+    
     index = parsed["index"]
 
     tutorial_links = cfe.find_tutorial_links_for_problem(contest_id, index)
