@@ -1,0 +1,32 @@
+# Repository-level ignores
+# Environment variables
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Python virtual environments
+venv/
+env/
+ENV/
+backend/codeEvv
+**/venv/
+**/env/
+**/ENV/
+
+# Node.js dependencies
+node_modules/
+**/node_modules/
+
+# IDE and OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log

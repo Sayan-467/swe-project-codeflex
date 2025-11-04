@@ -1,0 +1,140 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║            CODEFORCES EDITORIAL FETCHER - QUICK REFERENCE                ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+📁 FINAL PROJECT STRUCTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✓ main.py              - FastAPI server (API endpoints)
+  ✓ cf_editorial.py      - Core scraping logic
+  ✓ requirements.txt     - Dependencies
+  ✓ .env                 - API credentials (keep private!)
+  ✓ .venv/               - Virtual environment
+  ✓ start_server.ps1     - Quick startup script
+  ✓ test_preview.py      - Test script
+  ✓ README.md            - Full documentation
+
+
+🚀 EASIEST WAY TO START (EVERY TIME)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. Open PowerShell in project folder
+  
+  2. Run the startup script:
+     .\start_server.ps1
+  
+  3. Server will be running at: http://127.0.0.1:8000
+
+
+📝 ALTERNATIVE MANUAL START
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Step 1: Activate virtual environment
+    .\.venv\Scripts\Activate.ps1
+
+  Step 2: Start server
+    uvicorn main:app --reload
+
+
+🔗 HOW TO USE THE API
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Endpoint: GET /fetch/editorial
+  Parameter: problem_url=<codeforces_problem_url>
+
+  Example URLs:
+    • http://127.0.0.1:8000/fetch/editorial?problem_url=https://codeforces.com/contest/1741/problem/B
+    • http://127.0.0.1:8000/fetch/editorial?problem_url=https://codeforces.com/problemset/problem/2149/A
+
+
+🧪 TEST THE API
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Open NEW terminal (keep server running):
+    .\.venv\Scripts\Activate.ps1
+    python test_preview.py
+
+
+🌐 INTERACTIVE API DOCS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  While server is running, visit:
+    http://127.0.0.1:8000/docs
+
+  This opens Swagger UI where you can test the API interactively!
+
+
+📦 RESPONSE FORMAT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  {
+    "problem_metadata": {
+      "contestId": "1741",
+      "index": "B",
+      "name": "Funny Permutation",
+      "tags": ["constructive algorithms", "math"]
+    },
+    "tutorial_links": [
+      "https://codeforces.com/blog/entry/107908"
+    ],
+    "editorials": [
+      {
+        "url": "...",
+        "text": "Full editorial content..."
+      }
+    ]
+  }
+
+
+⚙️ WHAT EACH FILE DOES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  main.py
+    - FastAPI application
+    - Defines /fetch/editorial endpoint
+    - Handles HTTP requests/responses
+
+  cf_editorial.py
+    - Selenium web scraping (bypasses 403 blocks)
+    - Finds tutorial links from problem pages
+    - Fetches and cleans editorial text
+    - Codeforces API authentication
+
+  requirements.txt
+    - List of Python packages needed
+    - Use: pip install -r requirements.txt
+
+  .env
+    - Contains API credentials
+    - NEVER commit this to Git!
+    - Format:
+        CODEFORCES_API_KEY=your_key
+        CODEFORCES_API_SECRET=your_secret
+
+  start_server.ps1
+    - Automated startup script
+    - Activates venv and starts server
+
+  test_preview.py
+    - Quick test to verify everything works
+    - Shows formatted editorial preview
+
+
+💡 TIPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ✓ Keep the server terminal open while making API calls
+  ✓ Use Ctrl+C to stop the server
+  ✓ Check http://127.0.0.1:8000/docs for interactive API testing
+  ✓ First run may take longer (downloads ChromeDriver)
+  ✓ Editorial text is automatically cleaned for readability
+
+
+🛑 STOP SERVER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Press: Ctrl + C
+
+
+════════════════════════════════════════════════════════════════════════════
+            For full documentation, see README.md
+════════════════════════════════════════════════════════════════════════════

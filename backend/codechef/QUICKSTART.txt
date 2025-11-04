@@ -1,0 +1,107 @@
+# CodeChef Editorial Scraper - Setup Guide
+
+## Quick Setup
+
+### Step 1: Install Dependencies
+```powershell
+pip install -r requirements.txt
+```
+
+### Step 2: Configure API Key
+Create a `.env` file:
+```env
+# Choose one AI provider:
+GEMINI_API_KEY=your_gemini_api_key_here
+# OR
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+**Get API Keys:**
+- **Gemini**: https://aistudio.google.com/apikey
+- **OpenAI**: https://platform.openai.com/api-keys
+
+### Step 3: Start Server
+```powershell
+.\start_server.ps1
+# OR manually:
+uvicorn main:app --reload --port 8001
+```
+
+### Step 4: Test
+Open: http://localhost:8001/docs (Swagger UI)
+
+## Test Requests
+
+### Using PowerShell
+```powershell
+# Generate hints
+Invoke-RestMethod -Method POST -Uri "http://localhost:8001/generate/hints" `
+  -ContentType "application/json" `
+  -Body '{"problem_url": "https://www.codechef.com/problems/FLOW001"}'
+
+# Fetch editorial
+Invoke-RestMethod -Uri "http://localhost:8001/fetch/editorial?problem_url=https://www.codechef.com/problems/FLOW001"
+
+# Get metadata only
+Invoke-RestMethod -Uri "http://localhost:8001/metadata?problem_url=https://www.codechef.com/problems/FLOW001"
+```
+
+### Using curl
+```bash
+# Generate hints
+curl -X POST http://localhost:8001/generate/hints \
+  -H "Content-Type: application/json" \
+  -d '{"problem_url": "https://www.codechef.com/problems/FLOW001"}'
+
+# Fetch editorial
+curl "http://localhost:8001/fetch/editorial?problem_url=https://www.codechef.com/problems/FLOW001"
+
+# Get metadata only
+curl "http://localhost:8001/metadata?problem_url=https://www.codechef.com/problems/FLOW001"
+```
+
+## Troubleshooting
+
+### "No module named 'selenium'"
+```powershell
+pip install -r requirements.txt
+```
+
+### "No API key found"
+Check your `.env` file has the correct key name:
+- `GEMINI_API_KEY=...` OR `OPENAI_API_KEY=...`
+
+### "Selenium driver not found"
+The driver auto-downloads on first run. Wait for:
+```
+[WDM] - Downloading chromedriver...
+```
+
+### "Editorial not found"
+- Not all problems have editorials
+- Try with known problems: FLOW001, TEST
+- Check if the problem is from a recent contest (editorials may be delayed)
+
+## Testing the Scraper Directly
+
+Test editorial extraction without the API:
+```powershell
+python cc_editorial.py
+```
+
+This will test with the default problem URL and show the extraction process.
+
+## Performance Notes
+
+- First request takes ~5-10 seconds (Selenium startup + page load)
+- Subsequent requests: ~3-5 seconds each
+- Consider adding caching for production use
+
+## Next Steps
+
+1. Test with multiple problems to see extraction quality
+2. Adjust extraction strategies in `cc_editorial.py` if needed
+3. Add rate limiting for production use
+4. Consider caching frequent requests
+
+For full documentation, see `README.md`
