@@ -36,7 +36,7 @@ def fetch_discuss_explanations(problem_code: str):
     }
 
     try:
-        res = requests.get(search_url, headers=headers, timeout=10)
+        res = requests.get(search_url, headers=headers, timeout=20)
         res.raise_for_status()
         data = res.json()
 

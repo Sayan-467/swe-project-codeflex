@@ -7,16 +7,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 from dotenv import load_dotenv
+from fastapi.responses import JSONResponse
 import os
 import sys
 
-# Add paths to import from subdirectories
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Chatbot_Backend'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'CC_Editorial'))
+# Get a life bitches
+# sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'Chatbot_Backend'))
+# sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'CC_Editorial'))
 
-from chatbot_core import chat_with_bot
-from cc_editorial import fetch_discuss_explanations
-from hint_generator import generate_hints
+from Chatbot_Backend.chatbot_core import chat_with_bot
+from codechef.cc_editorial import fetch_discuss_explanations
+from CC_Editorial.hint_generator import generate_hints
 
 # Load environment variables
 load_dotenv()
@@ -56,12 +57,13 @@ def home():
 
 
 # ==================== CHATBOT ENDPOINTS ====================
-
 @app.post("/chat")
 def chat_endpoint(req: ChatRequest):
     """AI-powered chatbot for programming queries."""
     reply = chat_with_bot(req.message, req.context)
-    return {"reply": reply, "service": "chatbot"}
+    return JSONResponse(
+        status_code=200,
+        content={"reply": reply, "service": "chatbot"})
 
 
 # ==================== CC EDITORIAL ENDPOINTS ====================

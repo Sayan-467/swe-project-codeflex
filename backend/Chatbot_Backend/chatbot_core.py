@@ -19,16 +19,18 @@ def chat_with_bot(user_message: str, context: list = None):
     if context is None:
         context = []
 
-    conversation = "\n".join([f"User: {msg['user']}\nBot: {msg['bot']}" for msg in context])
+    conversation = "\n".join([f"User: {msg['user']}\nBot: {msg['assistant']}" for msg in context])
 
     prompt = f"""
-You are Codemitra — a friendly AI coding tutor that helps students understand programming concepts, debugging issues, and algorithmic logic.
+    You are Codemitra — a friendly AI coding tutor that helps students 
+    understand programming concepts, debugging issues, and algorithmic logic.
+    Conversation so far:
+    {conversation}
 
-Conversation so far:
-{conversation}
-
-User: {user_message}
-Bot:"""
+    User: {user_message}
+    Bot:
+    
+    Only provide plain text without markdown notations"""
 
     try:
         response = model.generate_content(prompt)

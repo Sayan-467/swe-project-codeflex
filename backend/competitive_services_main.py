@@ -4,18 +4,22 @@ Deployed on Render - Port 8001
 """
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional
 from dotenv import load_dotenv
 import os
 import sys
+import logging
 
-# Add paths to import from subdirectories
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'codechef'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'codeforces'))
+logger = logging.getLogger("uvicorn.error")  # standard logger for FastAPI/Uvicorn
 
-import cc_editorial as cce
-import cf_editorial as cfe
+# Get a life bitches
+# sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'codechef'))
+# sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'codeforces'))
+
+import codechef.cc_editorial as cce
+import codeforces.cf_editorial as cfe
 
 # Load environment variables
 load_dotenv()
@@ -69,7 +73,6 @@ def root():
 
 
 # ==================== CODECHEF ENDPOINTS ====================
-
 @app.post("/codechef/generate/hints")
 def codechef_generate_hints(input_data: InputURL):
     """
@@ -116,7 +119,7 @@ Each hint should:
 Editorial:
 {editorial_text}
 
-Now generate clear, structured hints:
+Now generate clear, structured hints strictlt in json format as array of objects with no extra text.
 """
 
     try:
@@ -136,12 +139,14 @@ Now generate clear, structured hints:
             )
             hints = completion.choices[0].message.content.strip()
 
-        return {
+        return JSONResponse(
+            status_code=200,
+            content={
             "problem": metadata,
             "editorial_available": True,
             "generated_hints": hints,
             "platform": "CodeChef"
-        }
+        })
 
     except Exception as e:
         return {"error": f"AI API error: {str(e)}"}
@@ -270,6 +275,8 @@ def codeforces_fetch_editorial(problem_url: Optional[str] = Query(None)):
         return {"error": "Invalid problem URL format."}
 
     contest_id = parsed["contest_id"]
+
+    
     index = parsed["index"]
 
     tutorial_links = cfe.find_tutorial_links_for_problem(contest_id, index)
